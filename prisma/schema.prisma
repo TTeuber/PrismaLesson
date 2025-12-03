@@ -1,0 +1,55 @@
+// This is your Prisma schema file
+// It defines your database models and their relationships
+// Learn more: https://pris.ly/d/prisma-schema
+
+// The generator block configures how Prisma Client is generated
+// This is the TypeScript/JavaScript client you'll use to query the database
+// Using the standard @prisma/client provider outputs to node_modules
+generator client {
+  provider = "prisma-client-js"
+}
+
+// The datasource block specifies which database to connect to
+// SQLite is a file-based database, perfect for development and demos
+datasource db {
+  provider = "sqlite"
+}
+
+// The User model represents users in the database
+// Each user can have multiple todos
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // One-to-many relationship: User has many Todos
+  todos     Todo[]
+}
+
+// The Todo model represents our todo items in the database
+// Each field maps to a column in the "Todo" table
+model Todo {
+  // @id marks this as the primary key
+  // @default(autoincrement()) auto-generates unique IDs starting from 1
+  id Int @id @default(autoincrement())
+
+  // The title of the todo item - required field (no ? means it's not optional)
+  title String
+
+  // Whether the todo is completed - defaults to false when not provided
+  completed Boolean @default(false)
+
+  // Automatically set to current timestamp when the record is created
+  createdAt DateTime @default(now())
+
+  // Automatically updated whenever the record is modified
+  updatedAt DateTime @updatedAt
+
+  // Foreign key field (required) - references User.id
+  userId    Int
+
+  // Relationship: Todo belongs to User
+  // onDelete: Cascade means if a user is deleted, their todos are also deleted
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
